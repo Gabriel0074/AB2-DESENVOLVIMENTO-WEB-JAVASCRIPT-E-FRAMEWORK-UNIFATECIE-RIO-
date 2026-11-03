@@ -1,0 +1,582 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Central de Operações | JavaScript</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --background: #0b1120;
+            --panel: #111c30;
+            --panel-light: #182640;
+            --primary: #60a5fa;
+            --primary-hover: #3b82f6;
+            --text: #f1f5f9;
+            --muted: #94a3b8;
+            --border: rgba(148, 163, 184, 0.18);
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 30px 16px;
+            font-family: "Segoe UI", Arial, sans-serif;
+            color: var(--text);
+            background:
+                radial-gradient(ellipse at top left, #172b4d 0%, transparent 45%),
+                radial-gradient(ellipse at bottom right, #172554 0%, transparent 40%),
+                var(--background);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 780px;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 25px;
+        }
+
+        .logo {
+            width: 58px;
+            height: 58px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            border: 1px solid rgba(96, 165, 250, 0.3);
+            border-radius: 17px;
+            background: linear-gradient(145deg, #1e40af, #2563eb);
+            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.22);
+            font-size: 27px;
+        }
+
+        .eyebrow {
+            margin-bottom: 6px;
+            color: var(--primary);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            font-size: clamp(23px, 4vw, 31px);
+            letter-spacing: -0.8px;
+        }
+
+        .subtitle {
+            margin-top: 7px;
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .panel {
+            padding: 30px;
+            border: 1px solid var(--border);
+            border-radius: 23px;
+            background: rgba(17, 28, 48, 0.94);
+            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.28);
+        }
+
+        .panel-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        h2 {
+            font-size: 19px;
+        }
+
+        .status {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            color: #86efac;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .status-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #4ade80;
+        }
+
+        .description {
+            margin-bottom: 24px;
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .options {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 13px;
+        }
+
+        .option {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            min-height: 91px;
+            padding: 17px;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            background: #131f34;
+            transition: border-color 0.2s, background 0.2s,
+                        transform 0.2s, box-shadow 0.2s;
+        }
+
+        .option:hover {
+            border-color: rgba(96, 165, 250, 0.6);
+            background: var(--panel-light);
+            transform: translateY(-2px);
+        }
+
+        .option:has(input:checked) {
+            border-color: var(--primary);
+            background: rgba(37, 99, 235, 0.14);
+            box-shadow: 0 0 0 1px rgba(96, 165, 250, 0.12);
+        }
+
+        .option input {
+            width: 17px;
+            height: 17px;
+            flex-shrink: 0;
+            cursor: pointer;
+            accent-color: var(--primary);
+        }
+
+        .option-icon {
+            width: 42px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            border-radius: 12px;
+            background: rgba(96, 165, 250, 0.12);
+            font-size: 20px;
+        }
+
+        .option-text {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .option-title {
+            font-size: 14px;
+            font-weight: 650;
+        }
+
+        .option-description {
+            color: var(--muted);
+            font-size: 11px;
+            line-height: 1.4;
+        }
+
+        .actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 23px;
+        }
+
+        button {
+            min-height: 47px;
+            padding: 0 20px;
+            border: none;
+            border-radius: 11px;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-primary {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            color: white;
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            box-shadow: 0 6px 18px rgba(37, 99, 235, 0.2);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #60a5fa, #3b82f6);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            color: #cbd5e1;
+            border: 1px solid var(--border);
+            background: #182338;
+        }
+
+        .btn-secondary:hover {
+            background: #24344e;
+        }
+
+        .result {
+            display: none;
+            align-items: flex-start;
+            gap: 13px;
+            margin-top: 22px;
+            padding: 18px;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            background: #0c1729;
+            animation: appear 0.25s ease;
+        }
+
+        .result.show {
+            display: flex;
+        }
+
+        .result-icon {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            border-radius: 10px;
+            background: rgba(74, 222, 128, 0.12);
+            font-size: 18px;
+        }
+
+        .result.error .result-icon {
+            background: rgba(248, 113, 113, 0.12);
+        }
+
+        .result-label {
+            margin-bottom: 5px;
+            color: var(--muted);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .result-message {
+            color: var(--text);
+            font-size: 14px;
+            line-height: 1.6;
+            overflow-wrap: anywhere;
+        }
+
+        .footer {
+            margin-top: 22px;
+            color: #64748b;
+            font-size: 11px;
+            text-align: center;
+            line-height: 1.7;
+        }
+
+        @keyframes appear {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 540px) {
+            .panel {
+                padding: 21px 17px;
+            }
+
+            .options {
+                grid-template-columns: 1fr;
+            }
+
+            .option {
+                min-height: 78px;
+            }
+
+            .header {
+                align-items: flex-start;
+            }
+
+            .logo {
+                width: 48px;
+                height: 48px;
+                font-size: 23px;
+            }
+
+            .panel-heading {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+
+            .btn-primary,
+            .btn-secondary {
+                width: 100%;
+                min-height: 46px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="container">
+
+        <header class="header">
+            <div class="logo">⌘</div>
+
+            <div>
+                <p class="eyebrow">Sistema de operações</p>
+                <h1>Central de Operações</h1>
+                <p class="subtitle">
+                    Selecione uma operação para continuar.
+                </p>
+            </div>
+        </header>
+
+        <section class="panel">
+
+            <div class="panel-heading">
+                <h2>Menu de opções</h2>
+
+                <span class="status">
+                    <span class="status-dot"></span>
+                    Sistema disponível
+                </span>
+            </div>
+
+            <p class="description">
+                Escolha uma das quatro operações disponíveis.
+                Em seguida, clique em "Executar operação" para
+                visualizar a mensagem correspondente.
+            </p>
+
+            <form id="formOperacoes">
+
+                <div class="options">
+
+                    <label class="option">
+                        <input
+                            type="radio"
+                            name="opcao"
+                            value="1"
+                        >
+
+                        <span class="option-icon">＋</span>
+
+                        <span class="option-text">
+                            <span class="option-title">
+                                01. Inserir dados
+                            </span>
+                            <span class="option-description">
+                                Operação de inclusão
+                            </span>
+                        </span>
+                    </label>
+
+                    <label class="option">
+                        <input
+                            type="radio"
+                            name="opcao"
+                            value="2"
+                        >
+
+                        <span class="option-icon">⌕</span>
+
+                        <span class="option-text">
+                            <span class="option-title">
+                                02. Consultar dados
+                            </span>
+                            <span class="option-description">
+                                Operação de consulta
+                            </span>
+                        </span>
+                    </label>
+
+                    <label class="option">
+                        <input
+                            type="radio"
+                            name="opcao"
+                            value="3"
+                        >
+
+                        <span class="option-icon">✎</span>
+
+                        <span class="option-text">
+                            <span class="option-title">
+                                03. Editar dados
+                            </span>
+                            <span class="option-description">
+                                Operação de alteração
+                            </span>
+                        </span>
+                    </label>
+
+                    <label class="option">
+                        <input
+                            type="radio"
+                            name="opcao"
+                            value="4"
+                        >
+
+                        <span class="option-icon">⌫</span>
+
+                        <span class="option-text">
+                            <span class="option-title">
+                                04. Excluir dados
+                            </span>
+                            <span class="option-description">
+                                Operação de exclusão
+                            </span>
+                        </span>
+                    </label>
+
+                </div>
+
+                <div class="actions">
+                    <button type="submit" class="btn-primary">
+                        Executar operação
+                        <span>→</span>
+                    </button>
+
+                    <button
+                        type="reset"
+                        class="btn-secondary"
+                    >
+                        Limpar seleção
+                    </button>
+                </div>
+
+            </form>
+
+            <div
+                class="result"
+                id="resultado"
+                role="status"
+                aria-live="polite"
+            >
+                <div class="result-icon" id="iconeResultado">
+                    ✓
+                </div>
+
+                <div>
+                    <p class="result-label" id="tituloResultado">
+                        Operação selecionada
+                    </p>
+
+                    <p
+                        class="result-message"
+                        id="ex21"
+                    ></p>
+                </div>
+            </div>
+
+        </section>
+
+        <footer class="footer">
+            JavaScript • Estruturas condicionais IF / ELSE<br>
+            Exemplo 21 — Interface de demonstração
+            Criado por - Patrick Gabriel dos Santos
+        </footer>
+
+    </main>
+
+    <script>
+        const formulario = document.getElementById("formOperacoes");
+        const resultado = document.getElementById("resultado");
+        const mensagemResultado = document.getElementById("ex21");
+        const tituloResultado = document.getElementById("tituloResultado");
+        const iconeResultado = document.getElementById("iconeResultado");
+
+        formulario.addEventListener("submit", function(event) {
+            event.preventDefault();
+            funcao();
+        });
+
+        function funcao() {
+            const selecionada = document.querySelector(
+                'input[name="opcao"]:checked'
+            );
+
+            let opcao;
+            let mensagem;
+
+            if (selecionada) {
+                opcao = selecionada.value;
+            } else {
+                opcao = "0";
+            }
+
+            if (opcao === "1") {
+                mensagem = "Escolhida a Inserção de Dados.";
+            }
+            else if (opcao === "2") {
+                mensagem = "Escolhida a Consulta de Dados.";
+            }
+            else if (opcao === "3") {
+                mensagem = "Escolhida a Edição de Dados.";
+            }
+            else if (opcao === "4") {
+                mensagem = "Escolhida a Exclusão de Dados.";
+            }
+            else {
+                mensagem = "Opção Inválida.";
+            }
+
+            mensagemResultado.textContent = mensagem;
+
+            if (opcao === "0") {
+                resultado.classList.add("error");
+                tituloResultado.textContent = "Atenção";
+                iconeResultado.textContent = "!";
+            } else {
+                resultado.classList.remove("error");
+                tituloResultado.textContent = "Operação selecionada";
+                iconeResultado.textContent = "✓";
+            }
+
+            resultado.classList.add("show");
+        }
+
+        formulario.addEventListener("reset", function() {
+            resultado.classList.remove("show", "error");
+            mensagemResultado.textContent = "";
+            tituloResultado.textContent = "Operação selecionada";
+            iconeResultado.textContent = "✓";
+        });
+    </script>
+
+</body>
+</html>
